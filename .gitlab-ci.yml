@@ -4,6 +4,7 @@ stages:
   - quality
   - package
   - deploy
+  - performance
 
 cache:
   paths:
