@@ -152,7 +152,7 @@
                                 </execution>
                             </executions>
                             <configuration>
-                                <imageName>${docker.image.prefix}/${project.artifactId}</imageName>
+                                <imageName>${env.CI_REGISTRY_IMAGE}/${docker.image.prefix}/${project.artifactId}</imageName>
                                 <dockerDirectory>${docker.image.dockerfile.dir}</dockerDirectory>
                                 <resources>
                                     <resource>
