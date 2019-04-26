@@ -35,9 +35,10 @@ test_job:
 
 code_quality_job:
   stage: quality
+  allow_failure: true
   image: docker:stable
   services:
-    docker:stable-dind
+    - docker:stable-dind
   script:
     - mkdir codequality-results
     - docker run
