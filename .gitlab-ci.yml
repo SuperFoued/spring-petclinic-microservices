@@ -17,13 +17,25 @@ variables:
 build_job:
   stage: build
   script:
-    - echo "OK"
+    - ./mvnw compile
+      -Dhttps.protocols=TLSv1.2
+      -Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository
+      -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN
+      -Dorg.slf4j.simpleLogger.showDateTime=true
+      -Djava.awt.headless=true
+      --batch-mode --errors --fail-at-end --show-version -DinstallAtEnd=true -DdeployAtEnd=true
   image: openjdk:8-alpine
 
 test_job:
   stage: test
   script:
-    - echo "OK"
+    - ./mvnw test
+      -Dhttps.protocols=TLSv1.2
+      -Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository
+      -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN
+      -Dorg.slf4j.simpleLogger.showDateTime=true
+      -Djava.awt.headless=true
+      --batch-mode --errors --fail-at-end --show-version -DinstallAtEnd=true -DdeployAtEnd=true
   image: openjdk:8-alpine
 
 code_quality_job:
@@ -46,7 +58,18 @@ package_job:
   variables:
     DOCKER_HOST: tcp://docker:2375
   script:
-    - echo "OK"
+    - apk add --no-cache docker openssh-client py3-pip python3-dev libffi-dev openssl-dev gcc libc-dev make
+    - pip3 install docker-compose
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+    - ./mvnw install -PbuildDocker -DskipTests=true -DpushImage
+      -Dhttps.protocols=TLSv1.2
+      -Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository
+      -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN
+      -Dorg.slf4j.simpleLogger.showDateTime=true
+      -Djava.awt.headless=true
+      --batch-mode --errors --fail-at-end --show-version -DinstallAtEnd=true -DdeployAtEnd=true
+    - docker-compose build
+    - docker-compose push
 
 deploy_staging_job:
   stage: deploy
