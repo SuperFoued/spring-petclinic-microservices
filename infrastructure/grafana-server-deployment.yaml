@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    kompose.cmd: kompose convert
+    kompose.cmd: kompose convert -f ../docker-compose.yml
     kompose.version: 1.22.0 (HEAD)
   creationTimestamp: null
   labels:
@@ -17,14 +17,14 @@ spec:
   template:
     metadata:
       annotations:
-        kompose.cmd: kompose convert
+        kompose.cmd: kompose convert -f ../docker-compose.yml
         kompose.version: 1.22.0 (HEAD)
       creationTimestamp: null
       labels:
         io.kompose.service: grafana-server
     spec:
       containers:
-        - image: grafana-server
+        - image: registry.gitlab.com/openclassrooms-devops/spring-petclinic-microservices/grafana:2.3.2
           name: grafana-server
           ports:
             - containerPort: 3000
