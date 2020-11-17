@@ -17,7 +17,6 @@ variables:
 build_job:
   stage: build
   script:
-    - echo 'OK'
     - ./mvnw compile
       -Dhttps.protocols=TLSv1.2
       -Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository
@@ -30,7 +29,6 @@ build_job:
 test_job:
   stage: test
   script:
-    - echo 'OK'
     - ./mvnw test
       -Dhttps.protocols=TLSv1.2
       -Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository
@@ -47,7 +45,6 @@ code_quality_job:
   services:
     - docker:stable-dind
   script:
-    - echo 'OK'
     - mkdir codequality-results
     - docker run
         --env CODECLIMATE_CODE="$PWD"
@@ -66,7 +63,6 @@ package_job:
   variables:
     DOCKER_HOST: tcp://docker:2375
   script:
-    - echo 'OK'
     - apk add --no-cache docker
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
     - ./mvnw install -PbuildDocker -DskipTests=true -DpushImage
@@ -82,7 +78,7 @@ deploy_staging_job:
   stage: deploy
   image: docker:stable
   script:
-    - echo 'OK'
+    - kubectl create secret docker-registry gitlab-registry --docker-server="$CI_REGISTRY" --docker-username="$CI_DEPLOY_USER" --docker-password="$CI_DEPLOY_PASSWORD" --docker-email="$GITLAB_USER_EMAIL" -o yaml --dry-run | kubectl apply -f -
     - apk add --no-cache openssh-client py-pip python-dev libffi-dev openssl-dev gcc libc-dev make
     - pip install docker-compose
     - export DOCKER_HOST=tcp://$PLAYWD.direct.labs.play-with-docker.com:2375
