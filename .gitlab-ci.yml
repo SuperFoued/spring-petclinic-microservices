@@ -58,6 +58,7 @@ code_quality_job:
 
 package_job:
   stage: package
+  image: openjdk:8-alpine
   services:
     - docker:stable-dind
   variables:
@@ -75,12 +76,16 @@ package_job:
       --batch-mode --errors --fail-at-end --show-version -DinstallAtEnd=true -DdeployAtEnd=true
     - docker-compose build
     - docker-compose push
-  image: openjdk:8-alpine
 
 deploy_staging_job:
   stage: deploy
-  image: docker:stable
+  image: alpine/k8s:1.18.2
   script:
+    - kubectl config set-cluster k8s --server="${SERVER}"
+    - kubectl config set clusters.k8s.certificate-authority-data ${CERTIFICATE_AUTHORITY_DATA}
+    - kubectl config set-credentials gitlab --token="${USER_TOKEN}"
+    - kubectl config set-context default --cluster=k8s --user=gitlab
+    - kubectl config use-context default
     - kubectl create secret docker-registry gitlab-registry --docker-server="$CI_REGISTRY" --docker-username="$CI_DEPLOY_USER" --docker-password="$CI_DEPLOY_PASSWORD" --docker-email="$GITLAB_USER_EMAIL" -o yaml --dry-run | kubectl apply -f -
     - kubectl apply -f infrastructure/
   environment:
