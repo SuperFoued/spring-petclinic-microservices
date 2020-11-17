@@ -1,0 +1,16 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: api-gateway-ingress
+  namespace: spring-petclinic-microservices-12041858-staging
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+  - host: cloudnord-kube.laurentgrangeau.fr
+    http:
+        paths:
+        - path: /
+          backend:
+            serviceName: api-gateway
+            servicePort: 8080
