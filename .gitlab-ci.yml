@@ -52,6 +52,8 @@ deploy_staging_job:
   stage: deploy
   image: alpine/k8s:1.18.2
   script:
+    - mkdir ~/.kube
+    - touch ~/.kube/config
     - echo $KUBECONFIG > ~/.kube/config
     - kubectl create secret docker-registry gitlab-registry --docker-server="$CI_REGISTRY" --docker-username="$CI_DEPLOY_USER" --docker-password="$CI_DEPLOY_PASSWORD" --docker-email="$GITLAB_USER_EMAIL" -o yaml --dry-run | kubectl apply -f -
     - kubectl apply -f infrastructure/
